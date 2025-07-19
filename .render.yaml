@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: Portafolio-Back-End-SC30
+    env: java
+    region: oregon
+    buildCommand: mvn package
+    startCommand: java -jar target/emails-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: EMAIL_USER
+        value: seruhiocode30@gmail.com
+      - key: EMAIL_PASS
+        value: rhfgaiifknoibgxo
+      - key: EMAIL_RECEIVER
+        value: seruhiocode30@gmail.com
