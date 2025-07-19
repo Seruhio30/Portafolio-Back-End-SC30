@@ -1,10 +1,9 @@
 services:
   - type: web
     name: Portafolio-Back-End-SC30
-    env: java
+    env: docker
     region: oregon
-    buildCommand: mvn package
-    startCommand: java -jar target/emails-0.0.1-SNAPSHOT.jar
+    plan: starter
     envVars:
       - key: EMAIL_USER
         value: seruhiocode30@gmail.com
