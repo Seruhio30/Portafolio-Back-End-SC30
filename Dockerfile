@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN ./mvn package -DskipTests
+RUN mvn package -DskipTests
 
 EXPOSE 8080
 
