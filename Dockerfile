@@ -2,14 +2,9 @@ FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
 
-# Instala Maven manualmente
-RUN apt-get update && \
-    apt-get install -y maven && \
-    mvn -version
+COPY . /app
 
-COPY . .
-
-RUN mvn package -DskipTests
+RUN ls -la /app && mvn package -DskipTests
 
 EXPOSE 8080
 
