@@ -1,6 +1,11 @@
-FROM maven:3.9.3-eclipse-temurin-21
+FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
+
+# Instala Maven manualmente
+RUN apt-get update && \
+    apt-get install -y maven && \
+    mvn -version
 
 COPY . .
 
