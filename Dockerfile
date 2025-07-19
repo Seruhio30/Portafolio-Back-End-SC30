@@ -1,10 +1,13 @@
-FROM eclipse-temurin:21-jdk
+FROM bellsoft/liberica-openjdk-debian:21
 
 WORKDIR /app
 
-COPY . /app
+# Instalar Maven y dependencias
+RUN apt-get update && apt-get install -y maven
 
-RUN ls -la /app && mvn package -DskipTests
+COPY . .
+
+RUN mvn package -DskipTests
 
 EXPOSE 8080
 
