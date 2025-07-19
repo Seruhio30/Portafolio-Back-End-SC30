@@ -2,10 +2,11 @@ FROM bellsoft/liberica-openjdk-debian:21
 
 WORKDIR /app
 
-# Instalar Maven y dependencias
+# Instala Maven manualmente
 RUN apt-get update && apt-get install -y maven
 
-COPY . .
+# Copia solo el proyecto Java desde la carpeta 'emails'
+COPY emails/ /app
 
 RUN mvn package -DskipTests
 
