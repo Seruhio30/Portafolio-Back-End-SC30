@@ -12,6 +12,8 @@ public class EmailRequest {
 
     private String contenido;
 
+    public EmailRequest() {}
+
     public String getRemitente() {
         return remitente;
     }
