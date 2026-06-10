@@ -8,6 +8,6 @@ services:
       - key: EMAIL_USER
         value: seruhiocode30@gmail.com
       - key: EMAIL_PASS
-        value: rhfgaiifknoibgxo
+        sync: false
       - key: EMAIL_RECEIVER
         value: seruhiocode30@gmail.com

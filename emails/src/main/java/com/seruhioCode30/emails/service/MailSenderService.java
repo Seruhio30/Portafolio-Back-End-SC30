@@ -1,51 +1,85 @@
 package com.seruhioCode30.emails.service;
 
-import com.seruhioCode30.emails.dto.EmailRequest;
-import jakarta.annotation.PostConstruct;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import com.seruhioCode30.emails.dto.EmailRequest;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-import java.util.Properties;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class MailSenderService {
-    private final JavaMailSender mailSender;
-    private static final Logger logger = LoggerFactory.getLogger(MailSenderService.class);
 
-    @Autowired
-    public MailSenderService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
-
+    @Value("${resend.api.key}")
+    private String apiKey;
     public void enviarCorreo(EmailRequest emailRequest) {
-        try {
-            MimeMessage mensaje = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mensaje, true);
 
-            helper.setTo("seruhiocode30@gmail.com"); // ✅ Siempre enviará el correo a tu dirección
-            helper.setFrom(emailRequest.getRemitente()); // ✅ Correo del remitente
-            helper.setSubject("Nuevo contacto: " + emailRequest.getNombre());
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://api.resend.com/emails";
 
-            // ✅ Cuerpo del correo con toda la información
-            String contenido = "<strong>Nombre:</strong> " + emailRequest.getNombre() + "<br>" +
-                    "<strong>Correo:</strong> " + emailRequest.getRemitente() + "<br>" +
-                    "<strong>Teléfono:</strong> " + emailRequest.getTelefono() + "<br>" +
-                    "<strong>Área de interés:</strong> " + emailRequest.getCategoria() + "<br><br>" +
-                    "<strong>Mensaje:</strong><br>" + emailRequest.getContenido();
+        Map<String, Object> body = new HashMap<>();
+        body.put("from", "SeruhioCode30 <onboarding@resend.dev>");
+        body.put("to", List.of("seruhiocode30@gmail.com"));
+        body.put("subject", "Nuevo mensaje del portafolio");
 
-            helper.setText(contenido, true);
+        // ✅ FECHA/HORA Costa Rica
+        String fecha = LocalDateTime.now(
+                java.time.ZoneId.of("America/Costa_Rica")
+        ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-            mailSender.send(mensaje);
-            System.out.println("✅ Correo recibido de: " + emailRequest.getRemitente());
-        } catch (MessagingException e) {
-            throw new RuntimeException("Error al enviar correo", e);
-        }
+        String html =
+                "<div style=\"font-family: Arial, sans-serif; padding: 20px; background: #F6F6F6; color: #000000;\">" +
+                        "<h2 style=\"color: #1158FC; border-bottom: 2px solid #22D4FD; padding-bottom: 4px;\">Nuevo mensaje del portafolio</h2>" +
+
+                        "<p><strong>Nombre:</strong> " + emailRequest.getNombre() + "</p>" +
+                        "<p><strong>Email:</strong> " + emailRequest.getRemitente() + "</p>" +
+                        "<p><strong>Teléfono:</strong> " + emailRequest.getTelefono() + "</p>" +
+                        "<p><strong>Categoría:</strong> " + emailRequest.getCategoria() + "</p>" +
+                        "<p><strong>Fecha/Hora:</strong> " + fecha + "</p>" +
+                        "<p><strong>IP:</strong> " + emailRequest.getIp() + "</p>" +
+                        "<p><strong>URL:</strong> <a href=\"" + emailRequest.getUrl() + "\">" + emailRequest.getUrl() + "</a></p>" +
+
+                        "<div style=\"margin-top: 20px; padding: 15px; background: #ffffff; border-left: 4px solid #22D4FD;\">" +
+                        "<p style=\"margin: 0;\"><strong>Mensaje:</strong></p>" +
+                        "<p style=\"white-space: pre-wrap;\">" + emailRequest.getContenido() + "</p>" +
+                        "</div>" +
+
+                        "<div style=\"margin-top: 20px;\">" +
+                        "<a href=\"mailto:" + emailRequest.getRemitente() + "\" " +
+                        "style=\"padding:10px 15px; background:#22D4FD; color:#000000; text-decoration:none; margin-right:10px;\">" +
+                        "Responder" +
+                        "</a>" +
+
+                        "<a href=\"https://wa.me/50687733663\" " +
+                        "style=\"padding:10px 15px; background:#1158FC; color:white; text-decoration:none;\">" +
+                        "WhatsApp" +
+                        "</a>" +
+                        "</div>" +
+
+                        "<p style=\"margin-top: 30px; font-size: 12px; color: #272727;\">Este mensaje proviene del formulario del portafolio SeruhioCode30.</p>" +
+                        "</div>";
+
+
+        body.put("html", html);
+        System.out.println("IP = " + emailRequest.getIp());
+        System.out.println("URL = " + emailRequest.getUrl());
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey);
+
+        HttpEntity<Map<String, Object>> request =
+                new HttpEntity<>(body, headers);
+
+        restTemplate.exchange(url, HttpMethod.POST, request, String.class);
     }
+
+
 }
