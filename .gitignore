@@ -1,0 +1,41 @@
+
+# IntelliJ / IDE
+
+.idea/
+
+*.iml
+
+
+
+# Java / Maven / Gradle
+
+target/
+
+build/
+
+.gradle/
+
+
+
+# Logs
+
+*.log
+
+
+
+# Environment / secrets
+
+.env
+
+*.env
+
+application-local.properties
+
+
+
+# OS
+
+.DS_Store
+
+Thumbs.db
+
