@@ -5,9 +5,9 @@ services:
     region: oregon
     plan: starter
     envVars:
-      - key: EMAIL_USER
+      - key: MAIL_USER
         value: seruhiocode30@gmail.com
-      - key: EMAIL_PASS
+      - key: MAIL_PASS
         sync: false
-      - key: EMAIL_RECEIVER
-        value: seruhiocode30@gmail.com
+      - key: RESEND_API_KEY
+        sync: false
