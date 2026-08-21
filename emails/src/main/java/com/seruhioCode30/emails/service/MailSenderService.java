@@ -8,7 +8,6 @@ import com.seruhioCode30.emails.dto.EmailRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ public class MailSenderService {
 
     @Value("${resend.api.key}")
     private String apiKey;
+
     public void enviarCorreo(EmailRequest emailRequest) {
 
         RestTemplate restTemplate = new RestTemplate();
@@ -42,7 +42,6 @@ public class MailSenderService {
                         "<p><strong>Teléfono:</strong> " + emailRequest.getTelefono() + "</p>" +
                         "<p><strong>Categoría:</strong> " + emailRequest.getCategoria() + "</p>" +
                         "<p><strong>Fecha/Hora:</strong> " + fecha + "</p>" +
-                        "<p><strong>IP:</strong> " + emailRequest.getIp() + "</p>" +
                         "<p><strong>URL:</strong> <a href=\"" + emailRequest.getUrl() + "\">" + emailRequest.getUrl() + "</a></p>" +
 
                         "<div style=\"margin-top: 20px; padding: 15px; background: #ffffff; border-left: 4px solid #22D4FD;\">" +
@@ -65,11 +64,7 @@ public class MailSenderService {
                         "<p style=\"margin-top: 30px; font-size: 12px; color: #272727;\">Este mensaje proviene del formulario del portafolio SeruhioCode30.</p>" +
                         "</div>";
 
-
         body.put("html", html);
-        System.out.println("IP = " + emailRequest.getIp());
-        System.out.println("URL = " + emailRequest.getUrl());
-
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -80,6 +75,5 @@ public class MailSenderService {
 
         restTemplate.exchange(url, HttpMethod.POST, request, String.class);
     }
-
 
 }
