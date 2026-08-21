@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.HtmlUtils;
 import com.seruhioCode30.emails.dto.EmailRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,38 +34,7 @@ public class MailSenderService {
                 java.time.ZoneId.of("America/Costa_Rica")
         ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-        String html =
-                "<div style=\"font-family: Arial, sans-serif; padding: 20px; background: #F6F6F6; color: #000000;\">" +
-                        "<h2 style=\"color: #1158FC; border-bottom: 2px solid #22D4FD; padding-bottom: 4px;\">Nuevo mensaje del portafolio</h2>" +
-
-                        "<p><strong>Nombre:</strong> " + emailRequest.getNombre() + "</p>" +
-                        "<p><strong>Email:</strong> " + emailRequest.getRemitente() + "</p>" +
-                        "<p><strong>Teléfono:</strong> " + emailRequest.getTelefono() + "</p>" +
-                        "<p><strong>Categoría:</strong> " + emailRequest.getCategoria() + "</p>" +
-                        "<p><strong>Fecha/Hora:</strong> " + fecha + "</p>" +
-                        "<p><strong>URL:</strong> <a href=\"" + emailRequest.getUrl() + "\">" + emailRequest.getUrl() + "</a></p>" +
-
-                        "<div style=\"margin-top: 20px; padding: 15px; background: #ffffff; border-left: 4px solid #22D4FD;\">" +
-                        "<p style=\"margin: 0;\"><strong>Mensaje:</strong></p>" +
-                        "<p style=\"white-space: pre-wrap;\">" + emailRequest.getContenido() + "</p>" +
-                        "</div>" +
-
-                        "<div style=\"margin-top: 20px;\">" +
-                        "<a href=\"mailto:" + emailRequest.getRemitente() + "\" " +
-                        "style=\"padding:10px 15px; background:#22D4FD; color:#000000; text-decoration:none; margin-right:10px;\">" +
-                        "Responder" +
-                        "</a>" +
-
-                        "<a href=\"https://wa.me/50687733663\" " +
-                        "style=\"padding:10px 15px; background:#1158FC; color:white; text-decoration:none;\">" +
-                        "WhatsApp" +
-                        "</a>" +
-                        "</div>" +
-
-                        "<p style=\"margin-top: 30px; font-size: 12px; color: #272727;\">Este mensaje proviene del formulario del portafolio SeruhioCode30.</p>" +
-                        "</div>";
-
-        body.put("html", html);
+        body.put("html", buildHtml(emailRequest, fecha));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -76,4 +46,42 @@ public class MailSenderService {
         restTemplate.exchange(url, HttpMethod.POST, request, String.class);
     }
 
+    String buildHtml(EmailRequest emailRequest, String fecha) {
+        String nombre = HtmlUtils.htmlEscape(emailRequest.getNombre());
+        String remitente = HtmlUtils.htmlEscape(emailRequest.getRemitente());
+        String telefono = HtmlUtils.htmlEscape(emailRequest.getTelefono());
+        String categoria = HtmlUtils.htmlEscape(emailRequest.getCategoria());
+        String contenido = HtmlUtils.htmlEscape(emailRequest.getContenido());
+        String requestUrl = HtmlUtils.htmlEscape(emailRequest.getUrl());
+
+        return "<div style=\"font-family: Arial, sans-serif; padding: 20px; background: #F6F6F6; color: #000000;\">" +
+                "<h2 style=\"color: #1158FC; border-bottom: 2px solid #22D4FD; padding-bottom: 4px;\">Nuevo mensaje del portafolio</h2>" +
+
+                "<p><strong>Nombre:</strong> " + nombre + "</p>" +
+                "<p><strong>Email:</strong> " + remitente + "</p>" +
+                "<p><strong>Teléfono:</strong> " + telefono + "</p>" +
+                "<p><strong>Categoría:</strong> " + categoria + "</p>" +
+                "<p><strong>Fecha/Hora:</strong> " + fecha + "</p>" +
+                "<p><strong>URL:</strong> <a href=\"" + requestUrl + "\">" + requestUrl + "</a></p>" +
+
+                "<div style=\"margin-top: 20px; padding: 15px; background: #ffffff; border-left: 4px solid #22D4FD;\">" +
+                "<p style=\"margin: 0;\"><strong>Mensaje:</strong></p>" +
+                "<p style=\"white-space: pre-wrap;\">" + contenido + "</p>" +
+                "</div>" +
+
+                "<div style=\"margin-top: 20px;\">" +
+                "<a href=\"mailto:" + remitente + "\" " +
+                "style=\"padding:10px 15px; background:#22D4FD; color:#000000; text-decoration:none; margin-right:10px;\">" +
+                "Responder" +
+                "</a>" +
+
+                "<a href=\"https://wa.me/50687733663\" " +
+                "style=\"padding:10px 15px; background:#1158FC; color:white; text-decoration:none;\">" +
+                "WhatsApp" +
+                "</a>" +
+                "</div>" +
+
+                "<p style=\"margin-top: 30px; font-size: 12px; color: #272727;\">Este mensaje proviene del formulario del portafolio SeruhioCode30.</p>" +
+                "</div>";
+    }
 }
