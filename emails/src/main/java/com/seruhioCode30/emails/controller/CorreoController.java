@@ -20,7 +20,6 @@ public class CorreoController {
 
     @PostMapping("/enviar")
     public ResponseEntity<String> enviarCorreo(@RequestBody EmailRequest emailRequest) {
-        System.out.println("🧐 Correo recibido de: " + emailRequest.getRemitente()); // ✅ Verifica el remitente
         mailSenderService.enviarCorreo(emailRequest);
         return ResponseEntity.ok("Solicitud enviada correctamente");
     }

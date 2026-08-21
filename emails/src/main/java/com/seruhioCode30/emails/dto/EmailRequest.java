@@ -14,8 +14,6 @@ public class EmailRequest {
 
     private String url;
 
-    private String ip;
-
     public EmailRequest() {}
 
     public String getRemitente() {
@@ -57,9 +55,12 @@ public class EmailRequest {
     public void setContenido(String contenido) {
         this.contenido = contenido;
     }
-    public String getIp() { return ip; }
-    public void setIp(String ip) { this.ip = ip; }
 
-    public String getUrl() { return url; }
-    public void setUrl(String url) { this.url = url; }
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }
