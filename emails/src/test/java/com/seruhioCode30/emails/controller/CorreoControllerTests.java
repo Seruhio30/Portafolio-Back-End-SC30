@@ -8,16 +8,21 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CorreoController.class)
 class CorreoControllerTests {
+
+    private static final String ALLOWED_ORIGIN = "https://seruhio30.github.io";
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,6 +48,62 @@ class CorreoControllerTests {
                 .andExpect(content().string("Solicitud enviada correctamente"));
 
         verify(mailSenderService).enviarCorreo(any());
+    }
+
+    @Test
+    void allowedProductionOriginReceivesCorsHeader() throws Exception {
+        mockMvc.perform(post("/correo/enviar")
+                        .header("Origin", ALLOWED_ORIGIN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "nombre":"Sergio",
+                                  "remitente":"sergio@example.com",
+                                  "telefono":"8888-8888",
+                                  "categoria":"pagina-web",
+                                  "contenido":"Mensaje válido",
+                                  "url":"https://seruhio30.github.io/Portfolio-SeruhioCode30-Front-End/"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", ALLOWED_ORIGIN));
+
+        verify(mailSenderService).enviarCorreo(any());
+    }
+
+    @Test
+    void arbitraryOriginIsRejectedByCors() throws Exception {
+        mockMvc.perform(post("/correo/enviar")
+                        .header("Origin", "https://evil.example")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "nombre":"Sergio",
+                                  "remitente":"sergio@example.com",
+                                  "telefono":"8888-8888",
+                                  "categoria":"pagina-web",
+                                  "contenido":"Mensaje válido",
+                                  "url":"https://evil.example/contact"
+                                }
+                                """))
+                .andExpect(status().isForbidden())
+                .andExpect(header().doesNotExist("Access-Control-Allow-Origin"));
+
+        verify(mailSenderService, never()).enviarCorreo(any());
+    }
+
+    @Test
+    void allowedProductionOriginPreflightSucceeds() throws Exception {
+        mockMvc.perform(options("/correo/enviar")
+                        .header("Origin", ALLOWED_ORIGIN)
+                        .header("Access-Control-Request-Method", "POST")
+                        .header("Access-Control-Request-Headers", "Content-Type"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", ALLOWED_ORIGIN))
+                .andExpect(header().string("Access-Control-Allow-Methods", containsString("POST")))
+                .andExpect(header().string("Access-Control-Allow-Headers", containsString("Content-Type")));
+
+        verify(mailSenderService, never()).enviarCorreo(any());
     }
 
     @Test
