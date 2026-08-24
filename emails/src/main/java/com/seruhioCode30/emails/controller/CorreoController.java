@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(
+        origins = "https://seruhio30.github.io",
+        methods = RequestMethod.POST,
+        allowedHeaders = "Content-Type"
+)
 @RestController
 @RequestMapping("/correo")
 public class CorreoController {
