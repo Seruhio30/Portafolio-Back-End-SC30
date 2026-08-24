@@ -1,17 +1,36 @@
 package com.seruhioCode30.emails.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 public class EmailRequest {
 
+    @NotBlank
+    @Email
+    @Size(max = 254)
     private String remitente;
 
+    @NotBlank
+    @Size(max = 100)
     private String nombre;
 
+    @Size(max = 40)
     private String telefono;
 
+    @Size(max = 50)
+    @Pattern(
+            regexp = "^$|pagina-web|aplicacion-web|full-stack|backend|colaboracion|oportunidad-profesional|otros$"
+    )
     private String categoria;
 
+    @NotBlank
+    @Size(max = 5000)
     private String contenido;
 
+    @NotBlank
+    @Size(max = 2048)
     private String url;
 
     public EmailRequest() {}
